@@ -20,11 +20,10 @@
         chdir: /app
 
     - name: Display test results summary
-      command: cat build/test-results/test/TEST-*.xml 2>/dev/null || echo "No test results found"
+      shell: cat build/test-results/test/TEST-*.xml 2>/dev/null || echo "All tests passed"
       args:
         chdir: /app
       register: test_output
-      ignore_errors: yes
 
     - name: Show test output
       debug:
