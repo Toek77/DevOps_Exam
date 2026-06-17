@@ -30,7 +30,7 @@ pipeline {
             post {
                 failure {
                     emailext(
-                        to: 'taktoek7@gmail.com',
+                        to: 'srengty@gmail.com',
                         subject: "BUILD FAILED: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
                         body: """
                             Build: ${env.BUILD_URL}
@@ -38,6 +38,9 @@ pipeline {
                             Commit: ${env.GIT_COMMIT}
 
                             Tests failed. Please check the build log.
+
+                            Changes:
+                            ${currentBuild.changeSets}
                         """.stripIndent()
                     )
                 }
@@ -47,9 +50,9 @@ pipeline {
         stage('Deploy') {
             steps {
                 sh '''
-                    echo "Deploying to Web Server via Ansible..."
+                    echo "Running Ansible playbook to deploy..."
                     ansible-playbook -i ansible/inventory-jenkins.ini ansible/deploy.yml || true
-                    echo "Build & Test passed - deployment complete"
+                    echo "Deploy stage complete"
                 '''
             }
         }
@@ -58,7 +61,8 @@ pipeline {
     post {
         failure {
             emailext(
-                to: 'taktoek7@gmail.com',
+                to: 'srengty@gmail.com',
+                recipientProviders: [[$class: 'DevelopersRecipientProvider']],
                 subject: "BUILD FAILED: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
                 body: """
                     Build: ${env.BUILD_URL}
@@ -72,7 +76,7 @@ pipeline {
         }
         success {
             emailext(
-                to: 'taktoek7@gmail.com',
+                to: 'srengty@gmail.com',
                 subject: "BUILD SUCCESS: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
                 body: """
                     Build: ${env.BUILD_URL}
