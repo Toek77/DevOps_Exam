@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>ID Card Preview</title>
+    <style>
+        :root {
+            --primary: #1d4ed8;
+            --secondary: #e0e7ff;
+            --text: #111827;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: #f3f4f6;
+            display: flex;
+            justify-content: center;
+            padding: 30px;
+        }
+        .card {
+            width: 350px;
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+        }
+        .card-header {
+            background: var(--primary);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        .card-header h2 {
+            font-size: 18px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+        .card-header .tagline {
+            font-size: 11px;
+            opacity: 0.85;
+            margin-top: 4px;
+        }
+        .card-photo {
+            display: flex;
+            justify-content: center;
+            margin-top: -30px;
+        }
+        .card-photo img {
+            width: 90px;
+            height: 110px;
+            object-fit: cover;
+            border-radius: 10px;
+            border: 3px solid white;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            background: var(--secondary);
+        }
+        .card-photo .no-photo {
+            width: 90px;
+            height: 110px;
+            border-radius: 10px;
+            border: 3px solid white;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            background: var(--secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            color: var(--text);
+        }
+        .card-body {
+            padding: 20px 24px;
+        }
+        .card-body h3 {
+            text-align: center;
+            font-size: 16px;
+            color: var(--text);
+            margin-bottom: 14px;
+        }
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 5px 0;
+            font-size: 12px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .detail-label {
+            color: #6b7280;
+            font-weight: 500;
+        }
+        .detail-value {
+            color: var(--text);
+            font-weight: 600;
+            text-align: right;
+        }
+        .card-qr, .card-barcode {
+            text-align: center;
+            padding: 10px 24px;
+        }
+        .card-qr img {
+            width: 100px;
+            height: 100px;
+        }
+        .card-barcode img {
+            width: 200px;
+            height: 40px;
+        }
+        .card-footer {
+            background: var(--secondary);
+            padding: 12px;
+            text-align: center;
+            font-size: 9px;
+            color: var(--primary);
+        }
+    </style>
+</head>
+<body>
+    <div class="card"
+         th:with="t=${profile.template}, layout=${t?.layout ?: 'VERTICAL'}">
+
+        <!-- Header -->
+        <div class="card-header"
+             th:style="'background:' + (${t?.primaryColor} ?: '#1d4ed8')">
+            <h2 th:text="${t?.organizationName} ?: 'ID Card'">Org Name</h2>
+            <div class="tagline" th:if="${t?.tagline}" th:text="${t.tagline}">Tagline</div>
+        </div>
+
+        <!-- Photo -->
+        <div class="card-photo">
+            <th:block th:if="${profile.hasPhoto()}">
+                <img th:src="@{/uploads/photos/{file}(file=${profile.photoFileName})}"
+                     alt="Photo" />
+            </th:block>
+            <th:block th:unless="${profile.hasPhoto()}">
+                <div class="no-photo">No Photo</div>
+            </th:block>
+        </div>
+
+        <!-- Body -->
+        <div class="card-body">
+            <h3 th:text="${profile.fullName}" th:style="'color:' + (${t?.textColor} ?: '#111827')">Full Name</h3>
+
+            <div class="detail-row">
+                <span class="detail-label">ID</span>
+                <span class="detail-value" th:text="${profile.registrationNumber}">2026-ENG-014</span>
+            </div>
+            <div class="detail-row" th:if="${profile.title}">
+                <span class="detail-label" th:text="${profile.type == T(net.orderzone.idcard.model.ProfileType).EMPLOYEE} ? 'Job Title' : 'Program'">Title</span>
+                <span class="detail-value" th:text="${profile.title}">Title</span>
+            </div>
+            <div class="detail-row" th:if="${profile.department}">
+                <span class="detail-label">Department</span>
+                <span class="detail-value" th:text="${profile.department}">Dept</span>
+            </div>
+            <div class="detail-row" th:if="${profile.email}">
+                <span class="detail-label">Email</span>
+                <span class="detail-value" th:text="${profile.email}">Email</span>
+            </div>
+            <div class="detail-row" th:if="${profile.phone}">
+                <span class="detail-label">Phone</span>
+                <span class="detail-value" th:text="${profile.phone}">Phone</span>
+            </div>
+            <div class="detail-row" th:if="${profile.bloodGroup}">
+                <span class="detail-label">Blood Group</span>
+                <span class="detail-value" th:text="${profile.bloodGroup}">Blood</span>
+            </div>
+            <div class="detail-row" th:if="${profile.dateOfBirth}">
+                <span class="detail-label">DOB</span>
+                <span class="detail-value" th:text="${profile.dateOfBirth}">DOB</span>
+            </div>
+            <div class="detail-row" th:if="${profile.issueDate}">
+                <span class="detail-label">Issued</span>
+                <span class="detail-value" th:text="${profile.issueDate}">Issue Date</span>
+            </div>
+            <div class="detail-row" th:if="${profile.expiryDate}">
+                <span class="detail-label">Expires</span>
+                <span class="detail-value" th:text="${profile.expiryDate}">Expiry Date</span>
+            </div>
+        </div>
+
+        <!-- QR Code -->
+        <div class="card-qr" th:if="${qrBase64}">
+            <img th:src="${qrBase64}" alt="QR Code" />
+        </div>
+
+        <!-- Barcode -->
+        <div class="card-barcode" th:if="${barcodeBase64}">
+            <img th:src="${barcodeBase64}" alt="Barcode" />
+        </div>
+
+        <!-- Footer -->
+        <div class="card-footer"
+             th:style="'background:' + (${t?.secondaryColor} ?: '#e0e7ff') + '; color:' + (${t?.primaryColor} ?: '#1d4ed8')">
+            <span th:text="${profile.type}">STUDENT</span> |
+            Valid ID Card |
+            <span th:if="${profile.expiryDate}" th:text="'Expires: ' + ${profile.expiryDate}">Expires</span>
+        </div>
+    </div>
+</body>
+</html>

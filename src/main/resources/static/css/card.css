@@ -1,0 +1,56 @@
+/* ID Card styling — used by Thymeleaf preview */
+.card {
+    width: 350px;
+    margin: 0 auto;
+    background: #fff;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+    font-family: 'Segoe UI', Arial, sans-serif;
+}
+.card-header {
+    padding: 20px;
+    text-align: center;
+    color: #fff;
+}
+.card-photo {
+    display: flex;
+    justify-content: center;
+    margin-top: -30px;
+}
+.card-photo img {
+    width: 90px;
+    height: 110px;
+    object-fit: cover;
+    border-radius: 10px;
+    border: 3px solid #fff;
+}
+.card-body {
+    padding: 20px 24px;
+}
+.detail-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 5px 0;
+    font-size: 12px;
+    border-bottom: 1px solid #f0f0f0;
+}
+.detail-label {
+    color: #6b7280;
+    font-weight: 500;
+}
+.detail-value {
+    font-weight: 600;
+    text-align: right;
+}
+.card-qr, .card-barcode {
+    text-align: center;
+    padding: 10px 24px;
+}
+.card-qr img { width: 100px; height: 100px; }
+.card-barcode img { width: 200px; height: 40px; }
+.card-footer {
+    padding: 12px;
+    text-align: center;
+    font-size: 9px;
+}
