@@ -12,14 +12,23 @@ RUN apt-get update && apt-get install -y \
     wget \
     unzip \
     netcat-openbsd \
+    mysql-client \
     && rm -rf /var/lib/apt/lists/*
 
-RUN mkdir /var/run/sshd
+# SSH setup
+RUN mkdir /var/run/sshd && echo 'root:ansible' | chpasswd
+RUN sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
 
 WORKDIR /app
 
-# Copy pre-built jar (build on host first: ./gradlew build -x test)
+# Copy pre-built jar for running
 COPY build/libs/idcard-0.0.1-SNAPSHOT.jar /app/app.jar
+
+# Copy project files for git pull + gradle build (Ansible tasks)
+COPY . /app
+
+RUN chmod +x gradlew
+
 COPY nginx.conf /etc/nginx/sites-available/default
 
 EXPOSE 22

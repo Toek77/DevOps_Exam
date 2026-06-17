@@ -9,6 +9,8 @@ services:
       MYSQL_DATABASE: B-Tak_Toek-db
     ports:
       - "3307:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
 
   web:
     build: .
@@ -18,3 +20,9 @@ services:
     ports:
       - "8443:8080"
       - "2222:22"
+    volumes:
+      - gradle-cache:/root/.gradle
+
+volumes:
+  mysql-data:
+  gradle-cache:

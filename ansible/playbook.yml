@@ -1,0 +1,43 @@
+---
+- name: ID Card - CI/CD Tasks
+  hosts: web
+  gather_facts: no
+
+  tasks:
+    - name: Ensure no local changes before git pull
+      command: git checkout -- .
+      args:
+        chdir: /app
+
+    - name: Git pull latest code
+      command: git pull origin main
+      args:
+        chdir: /app
+
+    - name: Build with Gradle and run tests against SQLite
+      command: ./gradlew clean build
+      args:
+        chdir: /app
+
+    - name: Display test results summary
+      command: cat build/test-results/test/TEST-*.xml 2>/dev/null || echo "No test results found"
+      args:
+        chdir: /app
+      register: test_output
+      ignore_errors: yes
+
+    - name: Show test output
+      debug:
+        msg: "{{ test_output.stdout }}"
+
+    - name: Backup MySQL database
+      command: >
+        mysqldump -h mysql -u root -pHello@123 B-Tak_Toek-db
+      args:
+        chdir: /app
+      register: backup
+
+    - name: Save backup.sql
+      copy:
+        content: "{{ backup.stdout }}"
+        dest: /app/backup.sql
