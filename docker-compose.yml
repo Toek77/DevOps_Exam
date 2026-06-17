@@ -23,6 +23,18 @@ services:
     volumes:
       - gradle-cache:/root/.gradle
 
+  phpmyadmin:
+    image: phpmyadmin:latest
+    container_name: phpmyadmin
+    restart: always
+    environment:
+      PMA_HOST: mysql
+      PMA_PORT: 3306
+    ports:
+      - "8083:80"
+    depends_on:
+      - mysql
+
 volumes:
   mysql-data:
   gradle-cache:
