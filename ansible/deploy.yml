@@ -1,0 +1,43 @@
+---
+- name: Deploy to Web Server
+  hosts: web
+  gather_facts: no
+
+  tasks:
+    - name: Stop running Java app
+      shell: pkill -f 'java -jar' || true
+      args:
+        chdir: /app
+
+    - name: Copy new jar from Jenkins workspace
+      copy:
+        src: build/libs/idcard-0.0.1-SNAPSHOT.jar
+        dest: /app/app.jar
+
+    - name: Restart NGINX
+      command: service nginx restart
+      args:
+        chdir: /app
+
+    - name: Start application
+      shell: nohup java -jar /app/app.jar > /app/app.log 2>&1 &
+      args:
+        chdir: /app
+
+    - name: Wait for app to start
+      wait_for:
+        port: 8081
+        delay: 5
+        timeout: 30
+
+    - name: Backup MySQL database after deploy
+      command: >
+        mysqldump -h mysql -u root -pHello@123 B-Tak_Toek-db
+      args:
+        chdir: /app
+      register: backup
+
+    - name: Save backup.sql
+      copy:
+        content: "{{ backup.stdout }}"
+        dest: /app/backup-{{ ansible_date_time.date }}.sql
