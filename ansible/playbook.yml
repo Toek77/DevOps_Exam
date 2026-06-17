@@ -5,7 +5,7 @@
 
   tasks:
     - name: Ensure no local changes before git pull
-      command: git checkout -- .
+      shell: git checkout -- . && git clean -fd
       args:
         chdir: /app
 
