@@ -38,9 +38,6 @@ pipeline {
                             Commit: ${env.GIT_COMMIT}
 
                             Tests failed. Please check the build log.
-
-                            Changes:
-                            ${currentBuild.changeSets}
                         """.stripIndent()
                     )
                 }
@@ -51,7 +48,7 @@ pipeline {
             steps {
                 sh '''
                     echo "Running Ansible playbook to deploy..."
-                    ansible-playbook -i ansible/inventory.ini ansible/deploy.yml
+                    ansible-playbook -i ansible/inventory-jenkins.ini ansible/deploy.yml
                 '''
             }
         }
@@ -60,8 +57,7 @@ pipeline {
     post {
         failure {
             emailext(
-                to: 'srengty@gmail.com',
-                recipientProviders: [[$class: 'DevelopersRecipientProvider']],
+                to: 'taktoek7@gmail.com',
                 subject: "BUILD FAILED: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
                 body: """
                     Build: ${env.BUILD_URL}
